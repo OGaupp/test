@@ -124,7 +124,7 @@ public sealed partial class Viewport3DPanel : UserControl
 
     private void OnViewportInvalidated()
     {
-        // DispatcherQueue sicherstellt Thread-Sicherheit
+        // DispatcherQueue stellt Thread-Sicherheit sicher
         DispatcherQueue?.TryEnqueue(Render);
     }
 
@@ -245,7 +245,7 @@ public sealed partial class Viewport3DPanel : UserControl
         var perspectiveScale = 1.0 / System.Math.Tan(fov / 2.0);
 
         var aspect = width / height;
-        var screenX = width / 2.0 + (viewPoint.X / -viewPoint.Z * perspectiveScale * height / 2.0);
+        var screenX = width / 2.0 + (viewPoint.X / -viewPoint.Z * perspectiveScale / aspect * height / 2.0);
         var screenY = height / 2.0 - (viewPoint.Y / -viewPoint.Z * perspectiveScale * height / 2.0);
 
         // Clipping

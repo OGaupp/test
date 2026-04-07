@@ -55,8 +55,24 @@ graph TD
 
 ### CadTool.WinUI (WinUI3 App, .NET 10-windows)
 - **Zweck:** Benutzeroberfläche und 3D-Viewport
-- **Abhängigkeiten:** Alle anderen Projekte, Windows App SDK, HelixToolkit.WinUI (geplant)
-- **Hinweis:** Nur auf Windows baubar
+- **Abhängigkeiten:** Alle anderen Projekte, Windows App SDK 1.6, HelixToolkit.SharpDX.Core, CommunityToolkit.Mvvm
+- **Hinweis:** Nur auf Windows baubar (XamlCompiler.exe benötigt Windows)
+- **Inhalte:**
+  - `App.xaml` – WinUI3 Application-Einstiegspunkt
+  - `MainWindow.xaml` – Hauptfenster: Toolbar + Scene-Tree + 3D-Viewport + Statusleiste
+  - `ViewModels/` – MainViewModel (MVVM mit RelayCommand), CadBodyViewModel
+  - `Controls/` – CadToolBar, SceneTreePanel, Viewport3DPanel, StatusBarPanel
+  - `Converters/` – MeshConverter (TriangleMesh → HelixToolkit MeshGeometry3D)
+  - `Services/` – (reserviert für zukünftige FileDialog-Integration)
+- **Features:**
+  - Primitiv-Erstellung via Toolbar (Box, Kugel, Zylinder, Torus)
+  - Boole'sche Operationen (Union, Subtract, Intersect)
+  - Transformationen (Verschieben, Drehen)
+  - DXF Import/Export
+  - 3D-Viewport mit Drahtgitter-Rendering + Bodenraster + Koordinatenachsen
+  - AutoCAD-Style Maus-Input: Mittlere Maustaste = Pan, Shift+Mitte = Orbit, Mausrad = Zoom
+  - Scene-Tree: ListView mit Sichtbarkeit-Checkbox und Selektion
+  - Statusleiste: Status-Text, Körper-/Dreieckszahl
 
 ## Mesh-basierte CSG-Operationen
 
@@ -135,4 +151,7 @@ und verbindet die OrbitalCameraController-Logik mit der konkreten Mauseingabe.
 | Bibliothek | Version | Zweck | Lizenz | Projekt |
 |---|---|---|---|---|
 | netDxf | 2023.11.10 | DXF-Dateien lesen/schreiben | MIT | CadTool.Infrastructure |
-| HelixToolkit.WinUI | (geplant) | 3D-Viewport & Rendering | MIT | CadTool.WinUI |
+| Microsoft.WindowsAppSDK | 1.6.250205002 | WinUI3 App Framework | MIT | CadTool.WinUI |
+| Microsoft.Windows.SDK.BuildTools | 10.0.26100.1742 | Windows SDK Build-Tools | Microsoft | CadTool.WinUI |
+| HelixToolkit.SharpDX.Core | 2.25.0 | 3D-Mesh-Geometrie für GPU-Rendering | MIT | CadTool.WinUI |
+| CommunityToolkit.Mvvm | 8.4.0 | MVVM-Framework (ObservableObject, RelayCommand) | MIT | CadTool.WinUI |
