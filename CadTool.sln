@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Pr
 		global.json = global.json
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadTool.WinUI", "src\CadTool.WinUI\CadTool.WinUI.csproj", "{7806B8C5-A8F0-CA3C-196B-8E2E69C42DAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{4811EC48-A3DA-4E61-BF11-560E49936D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4811EC48-A3DA-4E61-BF11-560E49936D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4811EC48-A3DA-4E61-BF11-560E49936D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7806B8C5-A8F0-CA3C-196B-8E2E69C42DAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7806B8C5-A8F0-CA3C-196B-8E2E69C42DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7806B8C5-A8F0-CA3C-196B-8E2E69C42DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7806B8C5-A8F0-CA3C-196B-8E2E69C42DAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,5 +64,8 @@ Global
 		{3831A6BE-DED5-4ED2-A795-4B792F84F7F8} = {2AA2D473-09AF-43DA-B86F-F48D7E17F85F}
 		{1C97B852-A5F1-4393-8790-08C1AEDDC1C9} = {DC6BDE99-7B39-4B91-938D-EC7B636660FC}
 		{4811EC48-A3DA-4E61-BF11-560E49936D0A} = {DC6BDE99-7B39-4B91-938D-EC7B636660FC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0206E18E-19EC-4BD1-84F1-4C914BC64382}
 	EndGlobalSection
 EndGlobal

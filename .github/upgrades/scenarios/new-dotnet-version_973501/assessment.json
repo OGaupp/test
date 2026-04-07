@@ -1,0 +1,306 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-04-07T08:05:19.0655258Z",
+  "analysisEndTime": "2026-04-07T08:05:20.8233689Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 5,
+      "issues": 1,
+      "incidents": 5,
+      "effort": 5
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 5,
+        "Optional": 0,
+        "Potential": 0,
+        "Information": 0
+      },
+      "category": {
+        "Project": 5
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "src\\CadTool.Core\\CadTool.Core.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CadTool.Core",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 16,
+        "numberOfCodeFiles": 16,
+        "linesTotal": 807,
+        "linesOfCode": 807,
+        "totalApiScanned": 1025,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "f7ab7386-c4e3-4408-a40e-cde8e32e8fb1",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CadTool.Core\\CadTool.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+              "protected": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CadTool.Core\\CadTool.Core.csproj",
+            "snippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "protectedSnippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "tests\\CadTool.Core.Tests\\CadTool.Core.Tests.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CadTool.Core.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 8,
+        "numberOfCodeFiles": 6,
+        "linesTotal": 2310,
+        "linesOfCode": 535,
+        "totalApiScanned": 517,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "ec3b1fcd-1bf0-40fd-8c84-3edd205fce7f",
+          "ruleId": "Project.0002",
+          "projectPath": "tests\\CadTool.Core.Tests\\CadTool.Core.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+              "protected": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0"
+            },
+            "kind": "File",
+            "path": "tests\\CadTool.Core.Tests\\CadTool.Core.Tests.csproj",
+            "snippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "protectedSnippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CadTool.Geometry\\CadTool.Geometry.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CadTool.Geometry",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 3,
+        "numberOfCodeFiles": 3,
+        "linesTotal": 131,
+        "linesOfCode": 131,
+        "totalApiScanned": 55,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "451c0c86-7596-498a-b3ff-12a1f035e266",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CadTool.Geometry\\CadTool.Geometry.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+              "protected": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CadTool.Geometry\\CadTool.Geometry.csproj",
+            "snippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "protectedSnippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "tests\\CadTool.Geometry.Tests\\CadTool.Geometry.Tests.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CadTool.Geometry.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 5,
+        "numberOfCodeFiles": 3,
+        "linesTotal": 1977,
+        "linesOfCode": 202,
+        "totalApiScanned": 168,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "ce0c2fff-8738-4981-930c-29ed946b69f2",
+          "ruleId": "Project.0002",
+          "projectPath": "tests\\CadTool.Geometry.Tests\\CadTool.Geometry.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+              "protected": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0"
+            },
+            "kind": "File",
+            "path": "tests\\CadTool.Geometry.Tests\\CadTool.Geometry.Tests.csproj",
+            "snippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "protectedSnippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CadTool.Infrastructure\\CadTool.Infrastructure.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CadTool.Infrastructure",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 39,
+        "linesOfCode": 39,
+        "totalApiScanned": 27,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "c8f7d8f4-43dc-41a6-b3bb-9793a7fbd6cd",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CadTool.Infrastructure\\CadTool.Infrastructure.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+              "protected": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CadTool.Infrastructure\\CadTool.Infrastructure.csproj",
+            "snippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "protectedSnippet": "Aktuelles Zielframework: net8.0\nEmpfohlenes Zielframework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Die Zielframeworks des Projekts m\u00FCssen in das neue Zielframework ge\u00E4ndert werden, das Sie f\u00FCr dieses Upgrade ausgew\u00E4hlt haben.\n\nW\u00E4hrend des Upgrades wird das Zielframework an die entsprechende Plattform angepasst, falls zutreffend. In einigen F\u00E4llen, f\u00FChrte das Upgrade des Projekts zu mehreren Zielframeworks, wenn es Features verwendete, die jetzt \u00FCber eigene Plattformen in modernen .NET-Frameworks (Windows, iOS, Android usw.) verf\u00FCgen.",
+      "label": "Die Zielframeworks des Projekts m\u00FCssen ge\u00E4ndert werden",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "\u00DCbersicht \u00FCber das Portieren von .NET\u00A0Framework zu .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": ".NET-Projekt-SDKs",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    }
+  }
+}
