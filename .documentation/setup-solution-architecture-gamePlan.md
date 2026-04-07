@@ -1,34 +1,52 @@
-# Game Plan: Solution Architecture & Foundation
+# Game Plan: Solution Architecture & Alle Phasen
 
 ## Ziel
 
-Setup der Multi-Projekt-Solution mit Clean Architecture für das CAD-Tool zur Schärfung
-von schneidplattenbestückten Rotationswerkzeugen.
+Vollständige Implementierung aller 4 Phasen der CAD-Tool-Roadmap.
 
 ## Aufgaben
 
+### Phase 1: Solution Architecture & Foundation ✅
 - [x] Solution-Struktur erstellen (.sln, global.json, Directory.Build.props)
 - [x] CadTool.Core: Domain-Modelle, Interfaces, Math-Typen
 - [x] CadTool.Geometry: 3D-Logik, Transforms, Boole'sche Operationen
 - [x] CadTool.Infrastructure: DXF-Service (Stub)
 - [x] CadTool.WinUI: Projekt-Stub (Windows-only)
-- [x] Unit Tests für Core (Vector3D, Matrix4x4, Plane3D, BoundingBox3D, Line3D, Primitives)
-- [x] Unit Tests für Geometry (TransformService, BooleanOperationService, PrimitiveFactory)
-- [x] Architektur-Dokumentation (architecture.md)
+
+### .NET 10 Upgrade ✅
+- [x] global.json auf .NET 10.0 aktualisiert
+- [x] Alle csproj-Dateien auf net10.0 migriert
+- [x] LangVersion auf 14 erhöht
+- [x] xUnit und Test-SDK auf aktuelle Versionen aktualisiert
+
+### Phase 2: Geometry Engine Integration ✅
+- [x] TriangleMesh + Triangle3D (Dreiecksnetze im Core)
+- [x] MeshGenerator: Primitive → Dreiecksnetz (Box, Sphere, Cylinder, Torus)
+- [x] MeshBooleanOperations: CSG via Ray-Casting mit Majority-Vote
+- [x] BooleanOperationService: Vollständige CSG-Integration statt Stub
+- [x] CadBody um Mesh-Property erweitert
+- [x] DxfService: Vollständige Implementierung mit netDxf (Import/Export)
+
+### Phase 3: 3D Viewport & Navigation ✅
+- [x] Camera3D: Plattformunabhängige Kamera-Abstraktion (ViewMatrix, Projektion)
+- [x] IViewport3D: Interface für UI-Integration
+- [x] OrbitalCameraController: Orbit, Pan, Zoom (AutoCAD-Style)
+- [x] StandardView: Top, Front, Right, Isometric etc.
+
+### Phase 4: CAD Features & Transformations ✅
+- [x] 3D-Kurven: LineCurve3D, ArcCurve3D, PolylineCurve3D, SplineCurve3D (B-Spline/De-Boor)
+- [x] DxfCurveConverter: DXF-Geometrie → 3D-Kurven
+- [x] TransformService: Point-to-Point Move/Rotate (bereits in Phase 1)
+
+### Tests ✅
+- [x] 156 Unit Tests gesamt (94 Core + 53 Geometry + 9 Infrastructure)
 
 ## Entscheidungen
 
 | Thema | Entscheidung | Begründung |
 |---|---|---|
-| Koordinatensystem | Z-up | Maschinenbau-Konvention |
-| .NET Version | 8.0 (via global.json) | Stabilität, LTS |
-| Math-Typen | Eigene Structs (immutable) | Keine Abhängigkeit zu System.Numerics für Portierbarkeit |
-| Primitive | Interface + sealed Klassen | Erweiterbar, aber kontrolliert |
-| Boole-Operationen | Stub mit BBox-Validierung | Echte CSG-Engine wird in Phase 2 integriert |
-
-## Offene Punkte
-
-- [ ] netDxf-Integration (Phase 2)
-- [ ] HelixToolkit.WinUI-Integration (Phase 3)
-- [ ] Mesh-Generierung aus Primitiven (Phase 3)
-- [ ] Point-to-Point Transformation UI (Phase 4)
+| .NET Version | 10.0 | User-Anforderung |
+| CSG-Methode | Ray-Casting mit Majority-Vote | Robust gegen Kanten-Treffer, einfache Primitiv-Subtraktionen ausreichend |
+| DXF-Library | netDxf 2023.11.10 | MIT-Lizenz, stabil, .NET-kompatibel |
+| Spline-Algorithmus | De-Boor | Standard für B-Spline-Auswertung, exakt |
+| Kamera-Steuerung | AutoCAD-Style | Branchenstandard im Maschinenbau |

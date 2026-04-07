@@ -23,75 +23,116 @@ graph TD
     Infra --> Core
 ```
 
-### CadTool.Core (Class Library)
+### CadTool.Core (Class Library, .NET 10)
 - **Zweck:** Domain-Modell, Interfaces, mathematische Grundtypen
-- **Abhängigkeiten:** Keine (reines .NET 8)
+- **Abhängigkeiten:** Keine (reines .NET 10)
 - **Inhalte:**
   - `Math/` – Vector3D, Matrix4x4, Plane3D, Line3D, BoundingBox3D
+  - `Mesh/` – Triangle3D, TriangleMesh (Dreiecksnetz für CSG-Ergebnisse)
   - `Primitives/` – IPrimitive3D, BoxPrimitive, SpherePrimitive, CylinderPrimitive, TorusPrimitive
-  - `Domain/` – CadBody, CadScene, ToolType
+  - `Curves/` – Curve3D, LineCurve3D, ArcCurve3D, PolylineCurve3D, SplineCurve3D (B-Spline mit De-Boor)
+  - `Viewport/` – Camera3D, IViewport3D, ProjectionType
+  - `Domain/` – CadBody (mit optionalem Mesh), CadScene, ToolType
   - `Interfaces/` – IBooleanOperationService, IDxfService, ITransformService
 
-### CadTool.Geometry (Class Library)
+### CadTool.Geometry (Class Library, .NET 10)
 - **Zweck:** Implementierung der 3D-Geometrie-Logik
 - **Abhängigkeiten:** CadTool.Core
 - **Wichtig:** Keine Abhängigkeit zu WinUI/XAML – rein mathematisch
 - **Inhalte:**
+  - `Mesh/` – MeshGenerator (Primitive→Dreiecksnetz), MeshBooleanOperations (CSG: Union, Subtract, Intersect)
   - `Transforms/` – TransformService (Point-to-Point Move/Rotate)
-  - `BooleanOps/` – BooleanOperationService (Union, Subtract, Intersect)
+  - `BooleanOps/` – BooleanOperationService (vollständige CSG-Integration)
+  - `Viewport/` – OrbitalCameraController (Orbit, Pan, Zoom im AutoCAD-Style)
+  - `Curves/` – DxfCurveConverter (DXF-Daten → 3D-Kurven)
   - `Primitives/` – PrimitiveFactory
 
-### CadTool.Infrastructure (Class Library)
+### CadTool.Infrastructure (Class Library, .NET 10)
 - **Zweck:** Externe Schnittstellen (DXF-Dateien)
-- **Abhängigkeiten:** CadTool.Core, netDxf (geplant)
+- **Abhängigkeiten:** CadTool.Core, netDxf
 - **Inhalte:**
-  - `Dxf/` – DxfService (Import/Export)
+  - `Dxf/` – DxfService (Import/Export mit netDxf: 3DFACE-Entitäten, Polylinien, Wireframes)
 
-### CadTool.WinUI (WinUI3 App)
+### CadTool.WinUI (WinUI3 App, .NET 10-windows)
 - **Zweck:** Benutzeroberfläche und 3D-Viewport
 - **Abhängigkeiten:** Alle anderen Projekte, Windows App SDK, HelixToolkit.WinUI (geplant)
 - **Hinweis:** Nur auf Windows baubar
 
-## Trennung: Werkzeug-Geometrie vs. Visualisierungs-Geometrie
+## Mesh-basierte CSG-Operationen
+
+```mermaid
+flowchart TD
+    A[Primitiv A] --> MA[MeshGenerator]
+    B[Primitiv B] --> MB[MeshGenerator]
+    MA --> MeshA[TriangleMesh A]
+    MB --> MeshB[TriangleMesh B]
+    MeshA --> CSG[MeshBooleanOperations]
+    MeshB --> CSG
+    CSG --> |Union / Subtract / Intersect| Result[Ergebnis-Mesh]
+    Result --> Body[CadBody mit Mesh]
+```
+
+Die Boole'schen Operationen arbeiten auf Dreiecksnetzen:
+1. **MeshGenerator** konvertiert Primitive (Box, Sphere, Cylinder, Torus) in TriangleMeshes
+2. **MeshBooleanOperations** führt CSG-Operationen aus (Ray-Casting mit Majority-Vote für Robustheit)
+3. Das Ergebnis ist ein neuer CadBody mit dem resultierenden Mesh
+
+## Kamera-Steuerung (AutoCAD-Style)
 
 ```mermaid
 flowchart LR
-    subgraph "Domain (plattformunabhängig)"
-        A[CadBody<br/>Mathematische Definition] --> B[IPrimitive3D<br/>Quader, Kugel, Zylinder, Torus]
-        A --> C[Matrix4x4<br/>Transformationen]
+    subgraph "Eingabe"
+        A[Mittlere Maustaste] --> Pan[Pan]
+        B[Shift + Mittlere Maustaste] --> Orbit[Orbit]
+        C[Mausrad] --> Zoom[Zoom]
     end
-    subgraph "Visualisierung (WinUI-spezifisch)"
-        D[3D Viewport<br/>HelixToolkit] --> E[Mesh-Konverter<br/>Primitive → Dreiecksnetz]
-        D --> F[Kamera-Controller<br/>Orbit, Pan, Zoom]
+    subgraph "OrbitalCameraController"
+        Pan --> Camera3D
+        Orbit --> Camera3D
+        Zoom --> Camera3D
     end
-    A -.->|Konvertierung| E
 ```
 
+## 3D-Kurven (DXF→3D)
+
+```mermaid
+classDiagram
+    class Curve3D {
+        <<abstract>>
+        +StartPoint: Vector3D
+        +EndPoint: Vector3D
+        +Length: double
+        +PointAt(t): Vector3D
+        +Tessellate(): Vector3D[]
+    }
+    Curve3D <|-- LineCurve3D
+    Curve3D <|-- ArcCurve3D
+    Curve3D <|-- PolylineCurve3D
+    Curve3D <|-- SplineCurve3D
+```
+
+Der **DxfCurveConverter** konvertiert DXF-Geometrie-Daten (Linien, Bögen, Splines) in die internen 3D-Kurven-Typen.
+
+## Trennung: Werkzeug-Geometrie vs. Visualisierungs-Geometrie
+
 Die **Werkzeug-Geometrie** (CadTool.Core + CadTool.Geometry) beschreibt Körper rein mathematisch
-über Primitive, Transformationsmatrizen und Boole'sche Operationen. Diese Schicht hat keine
+über Primitive, Dreiecksnetze, Transformationsmatrizen und Boole'sche Operationen. Diese Schicht hat keine
 Abhängigkeit zu einer UI-Bibliothek.
 
-Die **Visualisierungs-Geometrie** (CadTool.WinUI) konvertiert die mathematischen Definitionen
-in renderfähige Dreiecksnetze (Meshes) für die GPU. Diese Konvertierung ist einweg und dient
-ausschließlich der Darstellung.
+Die **Visualisierungs-Geometrie** (CadTool.WinUI) nutzt die TriangleMeshes direkt für die GPU-Darstellung
+und verbindet die OrbitalCameraController-Logik mit der konkreten Mauseingabe.
 
 ## Abhängigkeitsregeln
 
 1. `CadTool.Core` hat **keine** externen Abhängigkeiten
 2. `CadTool.Geometry` referenziert **nur** `CadTool.Core`
-3. `CadTool.Infrastructure` referenziert **nur** `CadTool.Core`
+3. `CadTool.Infrastructure` referenziert **nur** `CadTool.Core` + netDxf
 4. `CadTool.WinUI` referenziert alle anderen Projekte
 5. Keine zirkulären Abhängigkeiten erlaubt
 
-## Geplante externe Bibliotheken
+## Externe Bibliotheken
 
-| Bibliothek | Zweck | Lizenz | Projekt |
-|---|---|---|---|
-| netDxf | DXF-Dateien lesen/schreiben | MIT | CadTool.Infrastructure |
-| HelixToolkit.WinUI | 3D-Viewport & Rendering | MIT | CadTool.WinUI |
-
-## Nächste Schritte
-
-1. **Phase 2:** Integration von netDxf für DXF-Import/Export
-2. **Phase 3:** HelixToolkit.WinUI Integration für 3D-Viewport
-3. **Phase 4:** CAD-Operationen (Point-to-Point Transformationen, DXF→3D-Kurven)
+| Bibliothek | Version | Zweck | Lizenz | Projekt |
+|---|---|---|---|---|
+| netDxf | 2023.11.10 | DXF-Dateien lesen/schreiben | MIT | CadTool.Infrastructure |
+| HelixToolkit.WinUI | (geplant) | 3D-Viewport & Rendering | MIT | CadTool.WinUI |
