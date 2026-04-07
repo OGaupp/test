@@ -232,11 +232,15 @@ public sealed partial class Viewport3DPanel : UserControl
     }
 
     /// <summary>
-    /// Prueft ob mindestens ein Eckpunkt der Bounding Box im sichtbaren Bereich liegt.
-    /// Erspart die Dreiecksschleife fuer komplett unsichtbare Bodies.
+    /// Prueft ob ein Body potenziell sichtbar ist.
+    /// Konservative Pruefung: gibt im Zweifelsfall true zurueck, um falsche Ausblendung zu vermeiden.
     /// </summary>
     private bool IsBodyPotentiallyVisible(BoundingBox3D bbox, Matrix4x4 viewMatrix, double width, double height)
     {
+        // Sonderfall: Kameraposition liegt innerhalb der BBox → Body ist sicher sichtbar
+        if (bbox.Contains(_viewModel!.Camera.Position))
+            return true;
+
         // Alle 8 Ecken der BBox pruefen
         ReadOnlySpan<Vector3D> corners =
         [
@@ -250,13 +254,23 @@ public sealed partial class Viewport3DPanel : UserControl
             new(bbox.Max.X, bbox.Max.Y, bbox.Max.Z),
         ];
 
+        var allBehindCamera = true;
         foreach (var corner in corners)
         {
+            var viewPoint = viewMatrix.TransformPoint(corner);
+
+            // Mindestens eine Ecke vor der Kamera → noch sichtbar pruefbar
+            if (viewPoint.Z < 0)
+                allBehindCamera = false;
+
             if (ProjectToScreen(corner, viewMatrix, width, height) is not null)
                 return true;
         }
 
-        return false;
+        // Wenn Ecken sowohl vor als auch hinter der Kamera liegen, kann der Body
+        // den sichtbaren Bereich kreuzen, auch wenn keine Ecke sichtbar projiziert.
+        // Konservativ: sichtbar annehmen.
+        return !allBehindCamera && corners.Length > 0;
     }
 
     private void DrawGrid(Matrix4x4 viewMatrix, double width, double height)

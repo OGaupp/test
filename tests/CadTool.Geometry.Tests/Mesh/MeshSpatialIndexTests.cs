@@ -192,12 +192,9 @@ public class MeshSpatialIndexTests
         Assert.Equal(0, count);
     }
 
-    /// <summary>Erzeugt einen MeshSpatialIndex ueber Reflection, da die Klasse internal ist.</summary>
+    /// <summary>Erzeugt einen MeshSpatialIndex (internal-Klasse, sichtbar via InternalsVisibleTo).</summary>
     private static MeshSpatialIndex CreateIndex(TriangleMesh mesh)
     {
-        // MeshSpatialIndex ist internal, aber im selben Assembly-Sichtbereich dank InternalsVisibleTo
-        // Falls nicht konfiguriert, nutzen wir einen indirekten Test ueber MeshBooleanOperations.
-        // Hier testen wir direkt, da die Test-Assemblies Zugriff haben sollten.
         return new MeshSpatialIndex(mesh);
     }
 }
