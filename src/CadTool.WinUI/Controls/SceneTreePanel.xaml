@@ -1,0 +1,52 @@
+<UserControl
+    x:Class="CadTool.WinUI.Controls.SceneTreePanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:CadTool.WinUI.ViewModels">
+
+    <Grid Padding="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="Szene" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,8" />
+
+        <!-- Body-Liste -->
+        <ListView x:Name="BodyListView"
+                  Grid.Row="1"
+                  SelectionMode="Single"
+                  SelectionChanged="OnSelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:CadBodyViewModel">
+                    <Grid Padding="4" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Sichtbarkeit Toggle -->
+                        <CheckBox Grid.Column="0" Grid.RowSpan="2"
+                                  IsChecked="{x:Bind IsVisible, Mode=TwoWay}"
+                                  VerticalAlignment="Center"
+                                  MinWidth="0" />
+
+                        <!-- Name + Typ -->
+                        <TextBlock Grid.Column="1" Grid.Row="0"
+                                   Text="{x:Bind Name, Mode=OneWay}"
+                                   Style="{StaticResource BodyTextBlockStyle}" />
+                        <TextBlock Grid.Column="1" Grid.Row="1"
+                                   Text="{x:Bind InfoText}"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>
