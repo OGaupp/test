@@ -37,24 +37,30 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<CadBodyViewModel> Bodies { get; } = [];
 
     [ObservableProperty]
-    private CadBodyViewModel? _selectedBody;
+    public partial CadBodyViewModel? SelectedBody { get; set; }
 
     [ObservableProperty]
-    private string _statusText = "Bereit";
+    public partial string StatusText { get; set; }
 
     [ObservableProperty]
-    private int _bodyCount;
+    public partial int BodyCount { get; set; }
 
     [ObservableProperty]
-    private int _triangleCount;
+    public partial int TriangleCount { get; set; }
 
     /// <summary>Event: Viewport muss neu gerendert werden.</summary>
     public event Action? ViewportInvalidated;
 
     public MainViewModel()
     {
+        StatusText = "Bereit";
         _cameraController = new OrbitalCameraController(Camera);
         _cameraController.ResetToIsometric();
+    }
+
+    internal void InvalidateViewport()
+    {
+        ViewportInvalidated?.Invoke();
     }
 
     // --- Primitiv-Erstellung ---
@@ -98,7 +104,7 @@ public partial class MainViewModel : ObservableObject
 
         UpdateStats();
         StatusText = $"{name} hinzugefügt";
-        ViewportInvalidated?.Invoke();
+        InvalidateViewport();
     }
 
     // --- Boole'sche Operationen ---
@@ -145,7 +151,7 @@ public partial class MainViewModel : ObservableObject
 
             UpdateStats();
             StatusText = $"{operation} ausgeführt → {result.Name}";
-            ViewportInvalidated?.Invoke();
+            InvalidateViewport();
         }
         catch (Exception ex)
         {
@@ -167,7 +173,7 @@ public partial class MainViewModel : ObservableObject
         // Demo-Verschiebung um 10mm in X
         _transformService.MoveByPoints(SelectedBody.Body, Vector3D.Zero, new Vector3D(10, 0, 0));
         StatusText = $"{SelectedBody.Name} verschoben (+10mm X)";
-        ViewportInvalidated?.Invoke();
+        InvalidateViewport();
     }
 
     [RelayCommand]
@@ -182,7 +188,7 @@ public partial class MainViewModel : ObservableObject
         // Demo-Rotation um 45° um Z-Achse
         _transformService.RotateAroundAxis(SelectedBody.Body, Vector3D.Zero, Vector3D.UnitZ, System.Math.PI / 4);
         StatusText = $"{SelectedBody.Name} rotiert (45° um Z)";
-        ViewportInvalidated?.Invoke();
+        InvalidateViewport();
     }
 
     // --- DXF Im/Export ---
@@ -208,7 +214,7 @@ public partial class MainViewModel : ObservableObject
 
             UpdateStats();
             StatusText = $"{importedBodies.Count} Körper aus DXF importiert";
-            ViewportInvalidated?.Invoke();
+            InvalidateViewport();
         }
         catch (Exception ex)
         {
@@ -255,7 +261,7 @@ public partial class MainViewModel : ObservableObject
 
         UpdateStats();
         StatusText = $"{name} gelöscht";
-        ViewportInvalidated?.Invoke();
+        InvalidateViewport();
     }
 
     [RelayCommand]

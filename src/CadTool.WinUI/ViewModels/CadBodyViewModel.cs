@@ -37,7 +37,7 @@ public partial class CadBodyViewModel : ObservableObject
             {
                 Body.IsVisible = value;
                 OnPropertyChanged();
-                _parent.ViewportInvalidated?.Invoke();
+                _parent.InvalidateViewport();
             }
         }
     }

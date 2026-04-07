@@ -10,6 +10,7 @@ using CadTool.Geometry.Mesh;
 using CadTool.Geometry.Viewport;
 using CadTool.WinUI.ViewModels;
 using Windows.Foundation;
+using Windows.UI;
 
 namespace CadTool.WinUI.Controls;
 
@@ -29,9 +30,9 @@ public sealed partial class Viewport3DPanel : UserControl
     private Point _lastPointerPosition;
 
     // Render-Farben
-    private static readonly Microsoft.UI.Color WireframeColor = Microsoft.UI.Colors.CornflowerBlue;
-    private static readonly Microsoft.UI.Color SelectedColor = Microsoft.UI.Colors.Orange;
-    private static readonly Microsoft.UI.Color GridColor = Microsoft.UI.Colors.Gray;
+    private static readonly Color WireframeColor = Microsoft.UI.Colors.CornflowerBlue;
+    private static readonly Color SelectedColor = Microsoft.UI.Colors.Orange;
+    private static readonly Color GridColor = Microsoft.UI.Colors.Gray;
 
     public Viewport3DPanel()
     {
@@ -167,7 +168,7 @@ public sealed partial class Viewport3DPanel : UserControl
         TxtCameraInfo.Text = $"Pos: {camera.Position} | Ziel: {camera.Target}";
     }
 
-    private void DrawBody(CadBodyViewModel bodyVm, Matrix4x4 viewMatrix, double width, double height, Microsoft.UI.Color color)
+    private void DrawBody(CadBodyViewModel bodyVm, Matrix4x4 viewMatrix, double width, double height, Color color)
     {
         var body = bodyVm.Body;
 
@@ -221,7 +222,7 @@ public sealed partial class Viewport3DPanel : UserControl
         DrawAxis(Vector3D.Zero, new Vector3D(0, 0, gridSize), viewMatrix, width, height, Microsoft.UI.Colors.Blue);    // Z = Blau
     }
 
-    private void DrawAxis(Vector3D from, Vector3D to, Matrix4x4 viewMatrix, double width, double height, Microsoft.UI.Color color)
+    private void DrawAxis(Vector3D from, Vector3D to, Matrix4x4 viewMatrix, double width, double height, Color color)
     {
         var p0 = ProjectToScreen(from, viewMatrix, width, height);
         var p1 = ProjectToScreen(to, viewMatrix, width, height);
