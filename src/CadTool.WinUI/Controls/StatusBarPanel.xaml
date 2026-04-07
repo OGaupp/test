@@ -1,0 +1,36 @@
+<UserControl
+    x:Class="CadTool.WinUI.Controls.StatusBarPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+            BorderThickness="0,1,0,0"
+            Padding="12,4">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Status-Text -->
+            <TextBlock x:Name="TxtStatus" Grid.Column="0"
+                       Text="Bereit"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource CaptionTextBlockStyle}" />
+
+            <!-- Koerper-Zahl -->
+            <TextBlock x:Name="TxtBodyCount" Grid.Column="1"
+                       VerticalAlignment="Center" Margin="16,0"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <!-- Dreiecks-Zahl -->
+            <TextBlock x:Name="TxtTriangleCount" Grid.Column="2"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Grid>
+    </Border>
+</UserControl>

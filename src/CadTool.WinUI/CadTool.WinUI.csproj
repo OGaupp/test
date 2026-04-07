@@ -1,16 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- 
-    WinUI3 App-Projekt (Windows App SDK).
-    Dieses Projekt kann nur auf Windows mit dem Windows App SDK gebaut werden.
-    
-    Fuer die vollstaendige Build-Konfiguration wird das Windows App SDK benoetigt:
-    - Microsoft.WindowsAppSDK (NuGet)
-    - Microsoft.Windows.SDK.BuildTools (NuGet)
-    - HelixToolkit.WinUI (fuer 3D-Viewport)
-    
-    Hinweis: Dieses Projekt ist bewusst als Stub angelegt und wird erst auf einer
-    Windows-Entwicklungsmaschine vollstaendig konfiguriert.
-  -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
@@ -20,18 +8,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <Platforms>x64;x86;AnyCPU</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+    <PackageReference Include="HelixToolkit.SharpDX.Core" Version="2.25.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CadTool.Core\CadTool.Core.csproj" />
     <ProjectReference Include="..\CadTool.Geometry\CadTool.Geometry.csproj" />
     <ProjectReference Include="..\CadTool.Infrastructure\CadTool.Infrastructure.csproj" />
   </ItemGroup>
-
-  <!-- NuGet-Pakete werden auf Windows hinzugefuegt:
-  <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.*" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.*" />
-  </ItemGroup>
-  -->
 </Project>

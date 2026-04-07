@@ -1,0 +1,40 @@
+<Window
+    x:Class="CadTool.WinUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CadTool.WinUI"
+    xmlns:controls="using:CadTool.WinUI.Controls"
+    Title="CadTool – Schaerfwerkzeug CAD">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <controls:CadToolBar x:Name="ToolBar" Grid.Row="0" />
+
+        <!-- Hauptbereich: Scene-Tree + Viewport -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Scene-Tree (links) -->
+            <controls:SceneTreePanel x:Name="SceneTree" Grid.Column="0" />
+
+            <!-- Trennlinie -->
+            <Border Grid.Column="1" Width="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+            <!-- 3D-Viewport (rechts, Hauptbereich) -->
+            <controls:Viewport3DPanel x:Name="Viewport" Grid.Column="2" />
+        </Grid>
+
+        <!-- Statusleiste -->
+        <controls:StatusBarPanel x:Name="StatusBar" Grid.Row="2" />
+    </Grid>
+</Window>

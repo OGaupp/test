@@ -1,0 +1,85 @@
+<UserControl
+    x:Class="CadTool.WinUI.Controls.CadToolBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <CommandBar DefaultLabelPosition="Right" IsOpen="False">
+        <!-- Primitiv-Erstellung -->
+        <AppBarButton x:Name="BtnAddBox" Icon="Add" Label="Quader" Click="OnAddBox" />
+        <AppBarButton x:Name="BtnAddSphere" Label="Kugel" Click="OnAddSphere">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xF136;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BtnAddCylinder" Label="Zylinder" Click="OnAddCylinder">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE7C8;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BtnAddTorus" Label="Torus" Click="OnAddTorus">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE747;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+
+        <AppBarSeparator />
+
+        <!-- Boole-Operationen -->
+        <AppBarButton x:Name="BtnUnion" Label="Union" Click="OnBooleanUnion">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE8BB;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BtnSubtract" Label="Subtract" Click="OnBooleanSubtract">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE738;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BtnIntersect" Label="Intersect" Click="OnBooleanIntersect">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE71D;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+
+        <AppBarSeparator />
+
+        <!-- Transformationen -->
+        <AppBarButton x:Name="BtnMove" Label="Verschieben" Click="OnMove">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE7C2;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BtnRotate" Label="Drehen" Click="OnRotate">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE7AD;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+
+        <AppBarSeparator />
+
+        <!-- Kamera -->
+        <AppBarButton x:Name="BtnResetCam" Label="Reset" Click="OnResetCamera">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE72C;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BtnZoomFit" Label="Alles zeigen" Click="OnZoomToFit">
+            <AppBarButton.Icon>
+                <FontIcon Glyph="&#xE9A6;" />
+            </AppBarButton.Icon>
+        </AppBarButton>
+
+        <CommandBar.SecondaryCommands>
+            <!-- Datei-Operationen -->
+            <AppBarButton x:Name="BtnImportDxf" Icon="OpenFile" Label="DXF importieren" Click="OnImportDxf" />
+            <AppBarButton x:Name="BtnExportDxf" Icon="Save" Label="DXF exportieren" Click="OnExportDxf" />
+            <AppBarSeparator />
+            <AppBarButton x:Name="BtnDelete" Icon="Delete" Label="Löschen" Click="OnDeleteSelected" />
+            <AppBarButton x:Name="BtnClear" Icon="Clear" Label="Szene leeren" Click="OnClearScene" />
+            <AppBarSeparator />
+            <AppBarButton x:Name="BtnViewTop" Label="Draufsicht" Click="OnViewTop" />
+            <AppBarButton x:Name="BtnViewFront" Label="Vorderansicht" Click="OnViewFront" />
+            <AppBarButton x:Name="BtnViewRight" Label="Rechts" Click="OnViewRight" />
+        </CommandBar.SecondaryCommands>
+    </CommandBar>
+</UserControl>

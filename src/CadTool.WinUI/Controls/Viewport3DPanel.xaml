@@ -1,0 +1,39 @@
+<UserControl
+    x:Class="CadTool.WinUI.Controls.Viewport3DPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- 
+        3D-Viewport Container.
+        Das HelixToolkit-Viewport3DX wird im Code-Behind erstellt und eingefuegt,
+        da die WinUI-Integration ueber SwapChainPanel erfolgt.
+        Als Fallback zeigt ein Canvas die Drahtgitter-Projektion.
+    -->
+    <Grid x:Name="ViewportContainer"
+          Background="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}"
+          PointerPressed="OnPointerPressed"
+          PointerMoved="OnPointerMoved"
+          PointerReleased="OnPointerReleased"
+          PointerWheelChanged="OnPointerWheelChanged">
+
+        <!-- Fallback: Software-Rendering auf Canvas -->
+        <Canvas x:Name="RenderCanvas" />
+
+        <!-- Overlay: Koordinatenachsen-Info -->
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                    Padding="8" Opacity="0.7">
+            <TextBlock x:Name="TxtCameraInfo"
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+
+        <!-- Overlay: Hilfstext -->
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                   x:Name="TxtPlaceholder"
+                   Text="3D-Viewport&#x0a;Mittlere Maustaste: Pan | Shift+Mitte: Orbit | Mausrad: Zoom"
+                   TextAlignment="Center"
+                   Style="{StaticResource SubtitleTextBlockStyle}"
+                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                   Opacity="0.5" />
+    </Grid>
+</UserControl>
