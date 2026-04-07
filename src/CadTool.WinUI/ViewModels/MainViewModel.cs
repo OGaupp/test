@@ -172,6 +172,7 @@ public partial class MainViewModel : ObservableObject
 
         // Demo-Verschiebung um 10mm in X
         _transformService.MoveByPoints(SelectedBody.Body, Vector3D.Zero, new Vector3D(10, 0, 0));
+        SelectedBody.InvalidateMeshCache();
         StatusText = $"{SelectedBody.Name} verschoben (+10mm X)";
         InvalidateViewport();
     }
@@ -187,6 +188,7 @@ public partial class MainViewModel : ObservableObject
 
         // Demo-Rotation um 45° um Z-Achse
         _transformService.RotateAroundAxis(SelectedBody.Body, Vector3D.Zero, Vector3D.UnitZ, System.Math.PI / 4);
+        SelectedBody.InvalidateMeshCache();
         StatusText = $"{SelectedBody.Name} rotiert (45° um Z)";
         InvalidateViewport();
     }

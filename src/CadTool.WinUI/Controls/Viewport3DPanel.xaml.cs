@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using CadTool.Core.Math;
 using CadTool.Core.Viewport;
-using CadTool.Geometry.Mesh;
 using CadTool.Geometry.Viewport;
 using CadTool.WinUI.ViewModels;
 using Windows.Foundation;
@@ -29,10 +28,16 @@ public sealed partial class Viewport3DPanel : UserControl
     private bool _isOrbiting;
     private Point _lastPointerPosition;
 
-    // Render-Farben
-    private static readonly Color WireframeColor = Microsoft.UI.Colors.CornflowerBlue;
-    private static readonly Color SelectedColor = Microsoft.UI.Colors.Orange;
-    private static readonly Color GridColor = Microsoft.UI.Colors.Gray;
+    // Render-Throttling: verhindert mehrfache Komplett-Renderings pro Maus-Event-Burst
+    private bool _renderScheduled;
+
+    // Wiederverwendbare Brushes (vermeidet Neuerzeugung pro Frame)
+    private static readonly SolidColorBrush WireframeBrush = new(Microsoft.UI.Colors.CornflowerBlue);
+    private static readonly SolidColorBrush SelectedBrush = new(Microsoft.UI.Colors.Orange);
+    private static readonly SolidColorBrush GridBrush = new(Microsoft.UI.Colors.Gray);
+    private static readonly SolidColorBrush AxisXBrush = new(Microsoft.UI.Colors.Red);
+    private static readonly SolidColorBrush AxisYBrush = new(Microsoft.UI.Colors.Green);
+    private static readonly SolidColorBrush AxisZBrush = new(Microsoft.UI.Colors.Blue);
 
     public Viewport3DPanel()
     {
@@ -85,13 +90,13 @@ public sealed partial class Viewport3DPanel : UserControl
         if (_isOrbiting)
         {
             _cameraController.Orbit(deltaX, deltaY);
-            Render();
+            RequestRender();
             e.Handled = true;
         }
         else if (_isPanning)
         {
             _cameraController.Pan(deltaX, deltaY);
-            Render();
+            RequestRender();
             e.Handled = true;
         }
 
@@ -112,15 +117,33 @@ public sealed partial class Viewport3DPanel : UserControl
 
         var delta = e.GetCurrentPoint(this).Properties.MouseWheelDelta;
         _cameraController.Zoom(delta > 0 ? 1 : -1);
-        Render();
+        RequestRender();
         e.Handled = true;
+    }
+
+    // --- Render-Throttling ---
+
+    /// <summary>
+    /// Plant einen Render-Durchlauf. Mehrere schnelle Aufrufe werden zu einem einzigen
+    /// Render zusammengefasst (Coalescing), um redundante Komplett-Renderings zu vermeiden.
+    /// </summary>
+    private void RequestRender()
+    {
+        if (_renderScheduled) return;
+        _renderScheduled = true;
+
+        DispatcherQueue?.TryEnqueue(() =>
+        {
+            _renderScheduled = false;
+            Render();
+        });
     }
 
     // --- Rendering (Drahtgitter-Projektion) ---
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        Render();
+        RequestRender();
     }
 
     private void OnViewportInvalidated()
@@ -150,7 +173,7 @@ public sealed partial class Viewport3DPanel : UserControl
             ? Visibility.Visible
             : Visibility.Collapsed;
 
-        // Bodenraster zeichnen
+        // Bodenraster zeichnen (als einzelnes Path-Element statt vieler Lines)
         DrawGrid(viewMatrix, width, height);
 
         // Koerper zeichnen
@@ -159,25 +182,28 @@ public sealed partial class Viewport3DPanel : UserControl
             if (!bodyVm.IsVisible) continue;
 
             var isSelected = bodyVm == _viewModel.SelectedBody;
-            var color = isSelected ? SelectedColor : WireframeColor;
+            var brush = isSelected ? SelectedBrush : WireframeBrush;
 
-            DrawBody(bodyVm, viewMatrix, width, height, color);
+            DrawBody(bodyVm, viewMatrix, width, height, brush);
         }
 
         // Kamera-Info
         TxtCameraInfo.Text = $"Pos: {camera.Position} | Ziel: {camera.Target}";
     }
 
-    private void DrawBody(CadBodyViewModel bodyVm, Matrix4x4 viewMatrix, double width, double height, Color color)
+    private void DrawBody(CadBodyViewModel bodyVm, Matrix4x4 viewMatrix, double width, double height, SolidColorBrush brush)
     {
-        var body = bodyVm.Body;
-
-        // Mesh erzeugen (aus Primitiv oder vorhandenes Mesh)
-        var mesh = body.Mesh ?? (body.Primitive is not null ? MeshGenerator.GenerateMesh(body.Primitive) : null);
+        // Gecachtes Mesh verwenden (kein MeshGenerator.GenerateMesh im Renderpfad)
+        var mesh = bodyVm.GetOrCreateMesh();
         if (mesh is null) return;
 
-        // Drahtgitter: Kanten der Dreiecke zeichnen
-        var brush = new SolidColorBrush(color);
+        // Body-Level BBox-Clipping: fruehes Aussortieren unsichtbarer Koerper
+        var bodyBBox = mesh.GetBoundingBox();
+        if (!IsBodyPotentiallyVisible(bodyBBox, viewMatrix, width, height))
+            return;
+
+        // Drahtgitter als einzelnes Path-Element (statt 3*n separate Line-Elemente)
+        var pathGeometry = new PathGeometry();
         for (var i = 0; i < mesh.TriangleCount; i++)
         {
             var tri = mesh.GetTriangle(i);
@@ -188,24 +214,65 @@ public sealed partial class Viewport3DPanel : UserControl
 
             if (p0 is null || p1 is null || p2 is null) continue;
 
-            DrawLine(p0.Value, p1.Value, brush, 1);
-            DrawLine(p1.Value, p2.Value, brush, 1);
-            DrawLine(p2.Value, p0.Value, brush, 1);
+            var figure = new PathFigure { StartPoint = p0.Value, IsClosed = true };
+            figure.Segments.Add(new LineSegment { Point = p1.Value });
+            figure.Segments.Add(new LineSegment { Point = p2.Value });
+            pathGeometry.Figures.Add(figure);
         }
+
+        if (pathGeometry.Figures.Count > 0)
+        {
+            RenderCanvas.Children.Add(new Path
+            {
+                Data = pathGeometry,
+                Stroke = brush,
+                StrokeThickness = 1
+            });
+        }
+    }
+
+    /// <summary>
+    /// Prueft ob mindestens ein Eckpunkt der Bounding Box im sichtbaren Bereich liegt.
+    /// Erspart die Dreiecksschleife fuer komplett unsichtbare Bodies.
+    /// </summary>
+    private bool IsBodyPotentiallyVisible(BoundingBox3D bbox, Matrix4x4 viewMatrix, double width, double height)
+    {
+        // Alle 8 Ecken der BBox pruefen
+        ReadOnlySpan<Vector3D> corners =
+        [
+            new(bbox.Min.X, bbox.Min.Y, bbox.Min.Z),
+            new(bbox.Max.X, bbox.Min.Y, bbox.Min.Z),
+            new(bbox.Min.X, bbox.Max.Y, bbox.Min.Z),
+            new(bbox.Max.X, bbox.Max.Y, bbox.Min.Z),
+            new(bbox.Min.X, bbox.Min.Y, bbox.Max.Z),
+            new(bbox.Max.X, bbox.Min.Y, bbox.Max.Z),
+            new(bbox.Min.X, bbox.Max.Y, bbox.Max.Z),
+            new(bbox.Max.X, bbox.Max.Y, bbox.Max.Z),
+        ];
+
+        foreach (var corner in corners)
+        {
+            if (ProjectToScreen(corner, viewMatrix, width, height) is not null)
+                return true;
+        }
+
+        return false;
     }
 
     private void DrawGrid(Matrix4x4 viewMatrix, double width, double height)
     {
-        var brush = new SolidColorBrush(GridColor);
         var gridSize = 100.0;
         var gridStep = 10.0;
+
+        // Grid als einzelnes Path-Element (statt vieler separater Lines)
+        var gridGeometry = new PathGeometry();
 
         for (var x = -gridSize; x <= gridSize; x += gridStep)
         {
             var from = ProjectToScreen(new Vector3D(x, -gridSize, 0), viewMatrix, width, height);
             var to = ProjectToScreen(new Vector3D(x, gridSize, 0), viewMatrix, width, height);
             if (from is not null && to is not null)
-                DrawLine(from.Value, to.Value, brush, 0.3);
+                AddLineToGeometry(gridGeometry, from.Value, to.Value);
         }
 
         for (var y = -gridSize; y <= gridSize; y += gridStep)
@@ -213,21 +280,31 @@ public sealed partial class Viewport3DPanel : UserControl
             var from = ProjectToScreen(new Vector3D(-gridSize, y, 0), viewMatrix, width, height);
             var to = ProjectToScreen(new Vector3D(gridSize, y, 0), viewMatrix, width, height);
             if (from is not null && to is not null)
-                DrawLine(from.Value, to.Value, brush, 0.3);
+                AddLineToGeometry(gridGeometry, from.Value, to.Value);
         }
 
-        // Koordinatenachsen (farbig)
-        DrawAxis(Vector3D.Zero, new Vector3D(gridSize, 0, 0), viewMatrix, width, height, Microsoft.UI.Colors.Red);     // X = Rot
-        DrawAxis(Vector3D.Zero, new Vector3D(0, gridSize, 0), viewMatrix, width, height, Microsoft.UI.Colors.Green);   // Y = Gruen
-        DrawAxis(Vector3D.Zero, new Vector3D(0, 0, gridSize), viewMatrix, width, height, Microsoft.UI.Colors.Blue);    // Z = Blau
+        if (gridGeometry.Figures.Count > 0)
+        {
+            RenderCanvas.Children.Add(new Path
+            {
+                Data = gridGeometry,
+                Stroke = GridBrush,
+                StrokeThickness = 0.3
+            });
+        }
+
+        // Koordinatenachsen (farbig, jeweils ein eigenes Path-Element)
+        DrawAxis(Vector3D.Zero, new Vector3D(gridSize, 0, 0), viewMatrix, width, height, AxisXBrush);
+        DrawAxis(Vector3D.Zero, new Vector3D(0, gridSize, 0), viewMatrix, width, height, AxisYBrush);
+        DrawAxis(Vector3D.Zero, new Vector3D(0, 0, gridSize), viewMatrix, width, height, AxisZBrush);
     }
 
-    private void DrawAxis(Vector3D from, Vector3D to, Matrix4x4 viewMatrix, double width, double height, Color color)
+    private void DrawAxis(Vector3D from, Vector3D to, Matrix4x4 viewMatrix, double width, double height, SolidColorBrush brush)
     {
         var p0 = ProjectToScreen(from, viewMatrix, width, height);
         var p1 = ProjectToScreen(to, viewMatrix, width, height);
         if (p0 is not null && p1 is not null)
-            DrawLine(p0.Value, p1.Value, new SolidColorBrush(color), 2);
+            DrawLine(p0.Value, p1.Value, brush, 2);
     }
 
     /// <summary>
@@ -254,6 +331,14 @@ public sealed partial class Viewport3DPanel : UserControl
             return null;
 
         return new Point(screenX, screenY);
+    }
+
+    /// <summary>Fuegt eine Linie als PathFigure zu einer PathGeometry hinzu.</summary>
+    private static void AddLineToGeometry(PathGeometry geometry, Point from, Point to)
+    {
+        var figure = new PathFigure { StartPoint = from };
+        figure.Segments.Add(new LineSegment { Point = to });
+        geometry.Figures.Add(figure);
     }
 
     private void DrawLine(Point from, Point to, SolidColorBrush brush, double thickness)
