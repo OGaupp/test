@@ -22,12 +22,15 @@ public static class MeshBooleanOperations
         ArgumentNullException.ThrowIfNull(meshA);
         ArgumentNullException.ThrowIfNull(meshB);
 
+        // Raeumliche Indizes einmal vorberechnen und wiederverwenden
+        var indexB = new MeshSpatialIndex(meshB);
+        var indexA = new MeshSpatialIndex(meshA);
         var result = new TriangleMesh();
 
         // Dreiecke von A behalten, die ausserhalb von B liegen
-        CopyTrianglesOutside(meshA, meshB, result);
+        CopyTrianglesOutside(meshA, indexB, result);
         // Dreiecke von B behalten, die ausserhalb von A liegen
-        CopyTrianglesOutside(meshB, meshA, result);
+        CopyTrianglesOutside(meshB, indexA, result);
 
         return result;
     }
@@ -38,13 +41,16 @@ public static class MeshBooleanOperations
         ArgumentNullException.ThrowIfNull(meshA);
         ArgumentNullException.ThrowIfNull(meshB);
 
+        // Raeumliche Indizes einmal vorberechnen und wiederverwenden
+        var indexB = new MeshSpatialIndex(meshB);
+        var indexA = new MeshSpatialIndex(meshA);
         var result = new TriangleMesh();
 
         // Dreiecke von A behalten, die ausserhalb von B liegen
-        CopyTrianglesOutside(meshA, meshB, result);
+        CopyTrianglesOutside(meshA, indexB, result);
 
         // Dreiecke von B, die innerhalb von A liegen, invertiert hinzufuegen
-        CopyTrianglesInsideInverted(meshB, meshA, result);
+        CopyTrianglesInsideInverted(meshB, indexA, result);
 
         return result;
     }
@@ -55,59 +61,56 @@ public static class MeshBooleanOperations
         ArgumentNullException.ThrowIfNull(meshA);
         ArgumentNullException.ThrowIfNull(meshB);
 
+        // Raeumliche Indizes einmal vorberechnen und wiederverwenden
+        var indexB = new MeshSpatialIndex(meshB);
+        var indexA = new MeshSpatialIndex(meshA);
         var result = new TriangleMesh();
 
         // Dreiecke von A behalten, die innerhalb von B liegen
-        CopyTrianglesInside(meshA, meshB, result);
+        CopyTrianglesInside(meshA, indexB, result);
         // Dreiecke von B behalten, die innerhalb von A liegen
-        CopyTrianglesInside(meshB, meshA, result);
+        CopyTrianglesInside(meshB, indexA, result);
 
         return result;
     }
 
-    private static void CopyTrianglesOutside(TriangleMesh source, TriangleMesh reference, TriangleMesh target)
+    private static void CopyTrianglesOutside(TriangleMesh source, MeshSpatialIndex referenceIndex, TriangleMesh target)
     {
-        var refBBox = reference.GetBoundingBox();
-
         for (var i = 0; i < source.TriangleCount; i++)
         {
             var tri = source.GetTriangle(i);
             var centroid = tri.Centroid;
 
-            // Schneller BBox-Test: Liegt der Schwerpunkt ausserhalb der BBox, ist das Dreieck definitiv aussen
-            if (!refBBox.Contains(centroid) || !IsPointInsideMesh(centroid, reference))
+            // Raeumlicher Index prueft BBox und Majority-Vote intern
+            if (!referenceIndex.IsPointInside(centroid))
             {
                 AddTriangleToMesh(target, tri);
             }
         }
     }
 
-    private static void CopyTrianglesInside(TriangleMesh source, TriangleMesh reference, TriangleMesh target)
+    private static void CopyTrianglesInside(TriangleMesh source, MeshSpatialIndex referenceIndex, TriangleMesh target)
     {
-        var refBBox = reference.GetBoundingBox();
-
         for (var i = 0; i < source.TriangleCount; i++)
         {
             var tri = source.GetTriangle(i);
             var centroid = tri.Centroid;
 
-            if (refBBox.Contains(centroid) && IsPointInsideMesh(centroid, reference))
+            if (referenceIndex.IsPointInside(centroid))
             {
                 AddTriangleToMesh(target, tri);
             }
         }
     }
 
-    private static void CopyTrianglesInsideInverted(TriangleMesh source, TriangleMesh reference, TriangleMesh target)
+    private static void CopyTrianglesInsideInverted(TriangleMesh source, MeshSpatialIndex referenceIndex, TriangleMesh target)
     {
-        var refBBox = reference.GetBoundingBox();
-
         for (var i = 0; i < source.TriangleCount; i++)
         {
             var tri = source.GetTriangle(i);
             var centroid = tri.Centroid;
 
-            if (refBBox.Contains(centroid) && IsPointInsideMesh(centroid, reference))
+            if (referenceIndex.IsPointInside(centroid))
             {
                 // Windungsordnung umkehren (Normalen invertieren)
                 AddTriangleToMesh(target, new Triangle3D(tri.V0, tri.V2, tri.V1));
@@ -118,6 +121,9 @@ public static class MeshBooleanOperations
     /// <summary>
     /// Prueft, ob ein Punkt innerhalb eines geschlossenen Mesh liegt (Ray-Casting-Methode).
     /// Mehrere Strahlrichtungen werden getestet, um Probleme bei Kanten-Treffern zu vermeiden (Majority Vote).
+    ///
+    /// Hinweis: Fuer wiederholte Aufrufe gegen dasselbe Mesh ist MeshSpatialIndex.IsPointInside() deutlich schneller.
+    /// Diese Methode bleibt fuer Einzeltests und Kompatibilitaet erhalten.
     /// </summary>
     internal static bool IsPointInsideMesh(Vector3D point, TriangleMesh mesh)
     {
